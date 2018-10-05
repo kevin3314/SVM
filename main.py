@@ -19,6 +19,11 @@ except IndexError:
 3:シグモイドカーネル""")
     sys.exit()
 
+try:
+    write_name = args[3]
+except IndexError:
+    write_name = "result_pic"
+
 (xlist, ylist, data_dim) = func.get_datalist(file_name)
-inst = svm.Svm(xlist, ylist, data_dim, kernel_number)
+inst = svm.Svm(xlist, ylist, data_dim, kernel_number, write_name)
 inst.solve()

@@ -58,7 +58,7 @@ def get_datalist(file_name):
         sys.exit()
     return (x_list, y_list, n)
 
-def graph_dot(x_list, y_list, weight, shita):
+def graph_dot(x_list, y_list, weight, shita, write_name):
     """
     Xr,Yr,Xb,Yb: ラベル付けに応じて分類したデータ群
     """
@@ -67,6 +67,7 @@ def graph_dot(x_list, y_list, weight, shita):
     Xb = []
     Yb = []
 
+    #各データについてラベルを確認し分類する。
     for i, x in enumerate(x_list):
         if y_list[i] == 1.0:
             Xr.append(x[0])
@@ -77,29 +78,29 @@ def graph_dot(x_list, y_list, weight, shita):
     plt.scatter(Xr, Yr, c='red')
     plt.scatter(Xb, Yb, c='blue')
 
+    #識別器(直線)を表示する。
     X = np.linspace(np.max(x_list), np.min(x_list), 1000)
     y = (-1 * X * weight[0][0] / weight[0][1]) + shita / weight[0][1]
-
     plt.plot(X,y)
 
-    plt.savefig('dot_figure.png')
-
+    plt.savefig(write_name + '.png')
 
 def div_list(larger, mini, number):
+    #最大値最小値の間を等分割する。each_sub:幅
     each_sub = (larger - mini) / number
+    #l:等分割した各点の値
     l = []
     for i in range(number):
         l.append(mini + each_sub * i)
-
     return l
 
-def graph_ker(x_list, y_list, alpha_list, shita, kernel):
+def graph_ker(x_list, y_list, alpha_list, shita, kernel, write_name):
     Xr = []
     Yr = []
     Xb = []
     Yb = []
 
-    size = 10
+    size = 100
     large = np.max(x_list)
     mini = np.min(x_list)
     grid_x = div_list(large, mini, size)
@@ -119,7 +120,23 @@ def graph_ker(x_list, y_list, alpha_list, shita, kernel):
                 Xb.append(x[0])
                 Yb.append(x[1]) 
 
+    plt.scatter(Xr, Yr, 10, c='g')
+    plt.scatter(Xb, Yb, 10, c='y')
+
+    Xr = []
+    Yr = []
+    Xb = []
+    Yb = []
+
+    #各データについてラベルを確認し分類する。
+    for i, x in enumerate(x_list):
+        if y_list[i] == 1.0:
+            Xr.append(x[0])
+            Yr.append(x[1])
+        else:
+            Xb.append(x[0])
+            Yb.append(x[1])
     plt.scatter(Xr, Yr, c='red')
     plt.scatter(Xb, Yb, c='blue')
 
-    plt.savefig('Ker_pic.png')
+    plt.savefig(write_name + '.png')

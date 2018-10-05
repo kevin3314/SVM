@@ -7,12 +7,12 @@ import sys
 
 class Svm:
 
-    def __init__(self, x_list, y_list, data_dim, kernel=0): 
+    def __init__(self, x_list, y_list, data_dim, kernel, write_name): 
 
         """
         x_list : データのリスト
         y_list : 分類の値のリスト
-        kernel : カーネルとして何を使うかを指定.
+        kernel,kernel_number : カーネルとして何を使うかを指定.
                  0  -> 内積
                  1  -> 多項式
                  2  -> ガウス
@@ -27,6 +27,7 @@ class Svm:
         self.kernel_number = kernel
         self.N = len(x_list)
         self.data_dim = data_dim
+        self.write_name = write_name
 
         #定数部分を定義する。
         self.q = matrix(-1.0 * np.ones(self.N))
@@ -64,20 +65,23 @@ class Svm:
             print("alpha[",i,"]", alpha)
         print("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
+        #重みを計算する
         w = np.zeros((1,self.data_dim))
         for i in range(self.N):
             w = w + alpha_list[i] * self.y_list[i] * self.x_list[i]
         print("重みの値を表示します。")
+        print(w)
 
+        #閾値を計算する
         print("閾値を計算するサポートベクタを表示します")
         print(sup_number)
-
         shita = self.kernel(w[0], self.x_list[sup_number]) - self.y_list[sup_number]
         print("閾値を表示します。")
         print(shita)
 
+        #データの次元が2ならば2次元平面上に表示する.
         if self.data_dim == 2:
             if self.kernel_number == 0:
-                func.graph_dot(self.x_list, self.y_list, w, shita)  
+                func.graph_dot(self.x_list, self.y_list, w, shita, self.write_name)  
             else:
-                func.graph_ker(self.x_list, self.y_list, alpha_list, shita, self.kernel)
+                func.graph_ker(self.x_list, self.y_list, alpha_list, shita, self.kernel, self.write_name)
