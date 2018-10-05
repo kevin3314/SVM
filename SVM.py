@@ -50,11 +50,16 @@ class Svm:
         
         #alphaのリストを作る
         alpha_list = []
+        #サポートベクタの番号を覚えておく
+        sup_number = 0
+
         for i in range(self.N):
             alpha_list.append(sol['x'][i,0]) 
+            if sol['x'][i,0] > 0.1:
+                sup_number = i
+            
         print("アルファの値を表示します。")
-        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-        
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++") 
         for i , alpha in enumerate(alpha_list):
             print("alpha[",i,"]", alpha)
         print("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
@@ -63,8 +68,16 @@ class Svm:
         for i in range(self.N):
             w = w + alpha_list[i] * self.y_list[i] * self.x_list[i]
         print("重みの値を表示します。")
-        print(w)
 
-        shita = np.dot(w, self.x_list[0]) - self.y_list[0]
+        print("閾値を計算するサポートベクタを表示します")
+        print(sup_number)
+
+        shita = self.kernel(w[0], self.x_list[sup_number]) - self.y_list[sup_number]
         print("閾値を表示します。")
         print(shita)
+
+        if self.data_dim == 2:
+            if self.kernel_number == 0:
+                func.graph_dot(self.x_list, self.y_list, w, shita)  
+            else:
+                func.graph_ker(self.x_list, self.y_list, alpha_list, shita, self.kernel)

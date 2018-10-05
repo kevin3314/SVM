@@ -1,5 +1,8 @@
 import numpy as np
 import sys
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 #xに応じて色々なカーネルを返す関数。
 def determine_kernel(x):
@@ -21,7 +24,7 @@ def gauss(x1, x2):
 
 #シグモイドカーネル
 def sigmoid(x1, x2):
-    return np.tanh( np.dot(x1, x2) + 1)
+    return np.tanh( np.dot(x1, x2) + 2)
 
 #ファイル名を受け取って、データのリストと各データの次元を返す関数
 def get_datalist(file_name):
@@ -54,3 +57,69 @@ def get_datalist(file_name):
         print("エラー:ファイル名が間違っています。正しいファイル名を入力してください")
         sys.exit()
     return (x_list, y_list, n)
+
+def graph_dot(x_list, y_list, weight, shita):
+    """
+    Xr,Yr,Xb,Yb: ラベル付けに応じて分類したデータ群
+    """
+    Xr = []
+    Yr = []
+    Xb = []
+    Yb = []
+
+    for i, x in enumerate(x_list):
+        if y_list[i] == 1.0:
+            Xr.append(x[0])
+            Yr.append(x[1])
+        else:
+            Xb.append(x[0])
+            Yb.append(x[1])
+    plt.scatter(Xr, Yr, c='red')
+    plt.scatter(Xb, Yb, c='blue')
+
+    X = np.linspace(np.max(x_list), np.min(x_list), 1000)
+    y = (-1 * X * weight[0][0] / weight[0][1]) + shita / weight[0][1]
+
+    plt.plot(X,y)
+
+    plt.savefig('dot_figure.png')
+
+
+def div_list(larger, mini, number):
+    each_sub = (larger - mini) / number
+    l = []
+    for i in range(number):
+        l.append(mini + each_sub * i)
+
+    return l
+
+def graph_ker(x_list, y_list, alpha_list, shita, kernel):
+    Xr = []
+    Yr = []
+    Xb = []
+    Yb = []
+
+    size = 10
+    large = np.max(x_list)
+    mini = np.min(x_list)
+    grid_x = div_list(large, mini, size)
+    grid_y = div_list(large, mini, size) 
+
+    for i in range(size):
+        for j in range(size):
+            x = np.array([grid_x[i], grid_y[j]])
+            result = 0.0
+            for m in range(len(x_list)):
+                result += alpha_list[m] * y_list[m] * kernel(x, x_list[m])
+            result -= shita
+            if result > 0.0:
+                Xr.append(x[0])
+                Yr.append(x[1])
+            else:
+                Xb.append(x[0])
+                Yb.append(x[1]) 
+
+    plt.scatter(Xr, Yr, c='red')
+    plt.scatter(Xb, Yb, c='blue')
+
+    plt.savefig('Ker_pic.png')
