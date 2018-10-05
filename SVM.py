@@ -2,11 +2,12 @@ import numpy as np
 import cvxopt
 import func 
 from cvxopt import matrix, solvers
+import sys
 
 
 class Svm:
 
-    def __init__(self, x_list, y_list, kernel=0): 
+    def __init__(self, x_list, y_list, data_dim, kernel=0): 
 
         """
         x_list : データのリスト
@@ -16,6 +17,8 @@ class Svm:
                  1  -> 多項式
                  2  -> ガウス
                  3  -> シグモイド
+        N : データの数
+        data_dim : それぞれのデータの次元
         """
 
         self.x_list = x_list
@@ -23,6 +26,7 @@ class Svm:
         self.kernel = func.determine_kernel(kernel)
         self.kernel_number = kernel
         self.N = len(x_list)
+        self.data_dim = data_dim
 
         #定数部分を定義する。
         self.q = matrix(-1.0 * np.ones(self.N))
@@ -49,46 +53,18 @@ class Svm:
         for i in range(self.N):
             alpha_list.append(sol['x'][i,0]) 
         print("アルファの値を表示します。")
+        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         
         for i , alpha in enumerate(alpha_list):
             print("alpha[",i,"]", alpha)
         print("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-        print("\n")
 
-        w = np.zeros((1,2))
+        w = np.zeros((1,self.data_dim))
         for i in range(self.N):
-                w = w + alpha_list[i] * self.y_list[i] * self.x_list[i]
+            w = w + alpha_list[i] * self.y_list[i] * self.x_list[i]
         print("重みの値を表示します。")
         print(w)
 
         shita = np.dot(w, self.x_list[0]) - self.y_list[0]
         print("閾値を表示します。")
         print(shita)
-
-def get_datalist(file_name):
-    """
-    filename : データの入っているファイルの名前
-    x_list : データのリスト
-    y_list : 分類データのリスト
-    """
-
-    x_list = []
-    y_list = []
-
-    with open(file_name) as f:
-        for s_line in f:
-            s_line = s_line.split(",")
-            x = int(s_line[0])
-            y = int(s_line[1])
-            z = int(s_line[2])
-
-            x_list.append(np.array([x, y])) 
-            y_list.append(z)
-
-    return (x_list, y_list)
-
-if __name__ == '__main__':
-    file_name = "kernel_test_data.txt"
-    (xlist, ylist) = get_datalist(file_name)
-    svm = Svm(xlist, ylist, 2 )
-    svm.solve()
