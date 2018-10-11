@@ -3,7 +3,7 @@ import cvxopt
 import func 
 from cvxopt import matrix, solvers
 import sys
-
+import error
 
 class Svm:
 
@@ -12,18 +12,30 @@ class Svm:
         """
         x_list : データのリスト
         y_list : 分類の値のリスト
-        kernel,kernel_number : カーネルとして何を使うかを指定.
+        kernel_number : カーネルとして何を使うかを指定.
                  0  -> 内積
                  1  -> 多項式
                  2  -> ガウス
                  3  -> シグモイド
+        kernel_class: カーネルのインスタンスを持つ。パラメタを変えられる
+        kernel: カーネル関数
         N : データの数
         data_dim : それぞれのデータの次元
         """
 
         self.x_list = x_list
         self.y_list = y_list
-        self.kernel = func.determine_kernel(kernel)
+        try:
+            self.kernel_class = func.determine_kernel(kernel, func.set_def_dic(kernel))
+        except error.DetermineError:
+            print("""エラー：第二引数の値が誤っています.
+            0:カーネルなし
+            1:多項式カーネル
+            2:ガウスカーネル
+            3:シグモイドカーネル""")
+            sys.exit()            
+
+        self.kernel = self.kernel_class.return_fun()
         self.kernel_number = kernel
         self.N = len(x_list)
         self.data_dim = data_dim
@@ -69,16 +81,12 @@ class Svm:
         w = np.zeros((1,self.data_dim))
         for i in range(self.N):
             w = w + alpha_list[i] * self.y_list[i] * self.x_list[i]
-        print("重みの値を表示します。")
-        print(w)
+        self.w = w[0]
 
         #閾値を計算する
-        print("閾値を計算するサポートベクタを表示します")
-        print(sup_number)
-        shita = self.kernel(w[0], self.x_list[sup_number]) - self.y_list[sup_number]
-        print("閾値を表示します。")
-        print(shita)
+        shita = self.kernel(self.w, self.x_list[sup_number]) - self.y_list[sup_number]
 
+    def plot(self):
         #データの次元が2ならば2次元平面上に表示する.
         if self.data_dim == 2:
             if self.kernel_number == 0:
