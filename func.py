@@ -205,3 +205,14 @@ def graph_ker(x_list, y_list, alpha_list, shita, kernel, write_name):
     plt.scatter(Xb, Yb, c='blue')
 
     plt.savefig(write_name + '.png')
+
+def div_list(l, div_n):
+    result_l = []
+    for i in range(div_n):
+        result_l.append([])
+    
+    for i in range(len(l)):
+        index = i % div_n
+        result_l[index].append(l[i])
+    
+    return result_l

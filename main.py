@@ -2,6 +2,7 @@ import SVM as svm
 import sys
 import func
 import datetime
+import cr_vd as cr
 
 #コマンドラインから引数を受け取る
 args = sys.argv
@@ -23,12 +24,18 @@ except IndexError:
     sys.exit()
 
 try:
-    write_name = args[3]
+    cross_n = args[3]
+except IndexError:
+    print("エラー:第三引数には分割数を入力してください")
+    sys.exit()
+
+try:
+    write_name = args[4]
 except IndexError:
     today = datetime.datetime.today()
     day = str(today.year)+str(today.month)+str(today.day)+str(today.hour)+str(today.minute)+str(today.second)
     write_name = day
 
 (xlist, ylist, data_dim) = func.get_datalist(file_name)
-inst = svm.Svm(xlist, ylist, data_dim, kernel_number, write_name)
-inst.solve()
+inst = cr.val_class(xlist, ylist, data_dim, kernel_number, write_name, cross_n)
+inst.sol_pera()
