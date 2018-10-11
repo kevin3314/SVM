@@ -37,5 +37,7 @@ except IndexError:
     write_name = day
 
 (xlist, ylist, data_dim) = func.get_datalist(file_name)
+xlist = func.normal_list(xlist)
+ylist = func.normal_list(ylist)
 inst = cr.val_class(xlist, ylist, data_dim, kernel_number, write_name, cross_n)
 inst.sol_pera()

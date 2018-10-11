@@ -43,19 +43,29 @@ class val_class():
         elif self.kernel_number == 2:
             #ガウスカーネルの時
             score_list = []
-            for i in range(-10, 10):
-                p_dict = {"p1": pow(2, i)}
+            for n in [ -5.0 + x*0.1 for x in range(0, 10, 1)]:
+                p_dict = {"p1": pow(2, n)}
                 score = self.validate(p_dict)
                 score_list.append(score)
             print(score_list)
-            print("最良スコア: 2^"+ str(-10 + score_list.index(max(score_list))))
+            print("index:  "+ str(score_list.index(max(score_list))) + "最良スコア->" + str(max(score_list)))
+           
+            x = score_list.index(max(score_list))
+            print("solve: index->" + str(x))
+            x = -5.0 + x*0.1
+            print(x)
+
+            p_dict = {"p1": pow(2,x)}
+            inst = svm.Svm(self.x_list, self.y_list, self.data_dim, self.kernel_number, self.write_name, p_dict)
+            inst.solve()
+            inst.plot()
 
         else:
             #多項式、シグモイドカーネルの時
             score_dict = {}
-            for i in range(1, 10, 2):
-                for j in range(1, 10, 2):
-                    p_dict = {"p1": pow(2, i), "p2": pow(2,i)}
+            for i in [ -5.0 + x*0.1 for x in range(0, 10, 1)]:
+                for j in [ -5.0 + x*0.1 for x in range(0, 10, 1)]:
+                    p_dict = {"p1": pow(2, i), "p2": pow(2,j)}
                     score = self.validate(p_dict)
                     x1 = str(i)
                     x2 = str(j)

@@ -5,6 +5,12 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import error
 
+def normal_list(l):
+    maxi = np.max(l)
+    mini = np.min(l)
+    l = [x / maxi for x in l]
+    return l
+
 def set_def_dic(x):
     if x == 0: return {}
     elif x == 1: return {"p1": 1, "p2": 2}
@@ -65,7 +71,7 @@ class gauss_kernel(kernel):
         self.p1 = p_dict["p1"]
 
     def return_fun(self):
-        V = pow(self.p1, 2) 
+        V = self.p1
         def gauss(x1, x2):
             t = np.dot( x1-x2, x1-x2)
             return np.exp( -1 * t / (2 * V)) 
@@ -150,7 +156,7 @@ def graph_dot(x_list, y_list, weight, shita, write_name):
 
     plt.savefig(write_name + '.png')
 
-def div_list(larger, mini, number):
+def div_grid(larger, mini, number):
     #最大値最小値の間を等分割する。each_sub:幅
     each_sub = (larger - mini) / number
     #l:等分割した各点の値
@@ -168,8 +174,8 @@ def graph_ker(x_list, y_list, alpha_list, shita, kernel, write_name):
     div_number = 100
     large = np.max(x_list)
     mini = np.min(x_list)
-    grid_x = div_list(large, mini, div_number)
-    grid_y = div_list(large, mini, div_number) 
+    grid_x = div_grid(large, mini, div_number)
+    grid_y = div_grid(large, mini, div_number) 
 
     for i in range(div_number):
         for j in range(div_number):
