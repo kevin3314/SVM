@@ -5,12 +5,33 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import error
 
+#データをスケーリングする関数。単純に[0,1]にスケーリングする
 def normal_list(l):
     maxi = np.max(l)
     mini = np.min(l)
     l = [x / maxi for x in l]
     return l
 
+#リストを等分割する関数
+def div_list(l, div_n):
+    result_l = []
+    for i in range(div_n):
+        result_l.append([]) 
+    for i in range(len(l)):
+        index = i % div_n
+        result_l[index].append(l[i]) 
+    return result_l
+
+def div_grid(larger, mini, number):
+    #最大値最小値の間を等分割する。each_sub:幅
+    each_sub = (larger - mini) / number
+    #l:等分割した各点の値
+    l = []
+    for i in range(number):
+        l.append(mini + each_sub * i)
+    return l
+
+#デフォルトのパラメタを設定する関数.
 def set_def_dic(x):
     if x == 0: return {}
     elif x == 1: return {"p1": 1, "p2": 2}
@@ -19,19 +40,26 @@ def set_def_dic(x):
 
 #xに応じて色々なカーネルを返す関数。
 def determine_kernel(x, p_dict):
-    if x == 0: return dot_kernel
+    if x == 0: return dot_kernel()
     elif x == 1: return poly_kernel(p_dict)
     elif x == 2: return gauss_kernel(p_dict)
     elif x == 3: return sigmoid_kernel(p_dict)
     else:        raise error.DetermineError
 
+#カーネルの親クラス
 class kernel:
     def __init__(self):
         pass
 
-    def return_fun(self):
+    def set_pera(p_dict):
+        #パラメタを設定し直す関数
         pass
 
+    def return_fun(self):
+        #関数を返すクラス
+        pass
+
+#内積に対応するカーネルのクラス
 class dot_kernel(kernel):
     def __init__(self):
         pass
@@ -42,7 +70,7 @@ class dot_kernel(kernel):
     def return_fun(self):
         return np.dot
 
-#多項式カーネル
+#多項式カーネルに対応するクラス
 class poly_kernel(kernel):
     def __init__(self, p_dict):
         self.p1 = p_dict["p1"]
@@ -51,10 +79,6 @@ class poly_kernel(kernel):
     def set_pera(p_dict):
         self.p1 = p_dict["p1"]
         self.p2 = p_dict["p2"]
-
-    def poly(self, x1, x2):
-        naiseki = np.dot(x1, x2)
-        return pow( self.p1+naiseki, self.p2)
 
     def return_fun(self):
         def poly(x1, x2):
@@ -74,7 +98,7 @@ class gauss_kernel(kernel):
         V = self.p1
         def gauss(x1, x2):
             t = np.dot( x1-x2, x1-x2)
-            return np.exp( -1 * t / (2 * V)) 
+            return np.exp( -1 * t * V) 
         return gauss
 
 #シグモイドカーネル
@@ -86,10 +110,6 @@ class sigmoid_kernel(kernel):
     def set_pera(p_dict):
         self.p1 = p_dict["p1"]
         self.p2 = p_dict["p2"]
-
-    def sigmoid(self, x1, x2):
-        naiseki = np.dot(x1, x2)
-        return np.tanh( self.p1 * np.dot(x1, x2) + self.p2)
 
     def return_fun(self):
         def sigmoid(x1, x2):
@@ -151,27 +171,19 @@ def graph_dot(x_list, y_list, weight, shita, write_name):
 
     #識別器(直線)を表示する。
     X = np.linspace(np.max(x_list), np.min(x_list), 1000)
-    y = (-1 * X * weight[0][0] / weight[0][1]) + shita / weight[0][1]
+    y = (-1 * X * weight[0] / weight[1]) + shita / weight[1]
     plt.plot(X,y)
 
     plt.savefig(write_name + '.png')
 
-def div_grid(larger, mini, number):
-    #最大値最小値の間を等分割する。each_sub:幅
-    each_sub = (larger - mini) / number
-    #l:等分割した各点の値
-    l = []
-    for i in range(number):
-        l.append(mini + each_sub * i)
-    return l
-
 def graph_ker(x_list, y_list, alpha_list, shita, kernel, write_name):
+    #カーネルの場合識別器を図示する関数
     Xr = []
     Yr = []
     Xb = []
     Yb = []
 
-    div_number = 100
+    div_number = 50
     large = np.max(x_list)
     mini = np.min(x_list)
     grid_x = div_grid(large, mini, div_number)
@@ -211,14 +223,3 @@ def graph_ker(x_list, y_list, alpha_list, shita, kernel, write_name):
     plt.scatter(Xb, Yb, c='blue')
 
     plt.savefig(write_name + '.png')
-
-def div_list(l, div_n):
-    result_l = []
-    for i in range(div_n):
-        result_l.append([])
-    
-    for i in range(len(l)):
-        index = i % div_n
-        result_l[index].append(l[i])
-    
-    return result_l

@@ -49,7 +49,7 @@ class Svm:
         self.P = np.zeros((self.N, self.N))
         for i in range(self.N):
             for j in range(self.N):
-                self.P[i, j] = self.kernel( self.x_list[i], self.x_list[j]) * self.y_list[i] * self.y_list[j]
+                self.P[i, j] = 0.5 * self.kernel( self.x_list[i], self.x_list[j]) * self.y_list[i] * self.y_list[j]
         self.P = matrix(self.P) 
         self.A = np.zeros((1, self.N))
         for i in range(self.N):
@@ -115,6 +115,6 @@ class Svm:
         #データの次元が2ならば2次元平面上に表示する.
         if self.data_dim == 2:
             if self.kernel_number == 0:
-                func.graph_dot(self.x_list, self.y_list, w, shita, self.write_name)  
+                func.graph_dot(self.x_list, self.y_list, self.w, self.shita, self.write_name)  
             else:
                 func.graph_ker(self.x_list, self.y_list, self.alpha_list, self.shita, self.kernel, self.write_name)
