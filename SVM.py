@@ -20,7 +20,6 @@ class Svm:
         N : データの数
         data_dim : それぞれのデータの次元
         """
-
         self.x_list = x_list
         self.y_list = y_list
         try:
@@ -68,25 +67,21 @@ class Svm:
         
 
     def solve(self):
-        sol = solvers.qp(P=self.P, q=self.q, G=self.G, h=self.h, A=self.A, b=self.b)
-        
+        sol = solvers.qp(P=self.P, q=self.q, G=self.G, h=self.h, A=self.A, b=self.b) 
         #alphaのリストを作る
         alpha_list = []
         #サポートベクタの番号を覚えておく
         sup_number = 0
-
         for i in range(self.N):
             alpha_list.append(sol['x'][i,0]) 
             if sol['x'][i,0] > 0.1:
                 sup_number = i
         self.alpha_list = alpha_list
-
         #重みを計算する
         w = np.zeros((1,self.data_dim))
         for i in range(self.N):
             w = w + alpha_list[i] * self.y_list[i] * self.x_list[i]
         self.w = w[0]
-
         #閾値を計算する
         self.shita = self.kernel(self.w, self.x_list[sup_number]) - self.y_list[sup_number]
 
@@ -108,7 +103,6 @@ class Svm:
             all_num += 1
         print(str(cor_num) + "/" + str(all_num))
         print(float(cor_num) / float(all_num))
-
         return (float(cor_num) / float(all_num))
 
     def plot(self):

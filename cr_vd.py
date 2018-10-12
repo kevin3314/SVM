@@ -71,31 +71,33 @@ class val_class():
             
         elif self.kernel_number == 2:
             #ガウスカーネルの時
+            pera_list = []
             score_list = []
-            for i in [ x for x in range(100, 200, 2)]:
+            for i in [ 0.01 * x for x in range(1, 100, 2)]:
                 #p_dict = {"p1": pow(2, n)}
                 p_dict = {"p1": i}
                 score = self.validate(p_dict)
                 score_list.append(score)
-            print(score_list)
+                pera_list.append(p_dict["p1"])
             print("index:  "+ str(score_list.index(max(score_list))) + "最良スコア->" + str(max(score_list)))
-           
+            #最良スコアのインデックスをxに保存
             x = score_list.index(max(score_list))
             print("solve: index->" + str(x))
-
-            p_dict = {"p1": x*2 +100}
-            print(x*2+1)
+            #最良スコアでSVMを構成し識別器をグラフにする
+            p_dict = {"p1": 0.01 * (x+1)}
             inst = svm.Svm(self.x_list, self.y_list, self.data_dim, self.kernel_number, self.write_name, p_dict)
             inst.solve()
             inst.plot()
+            #グラフ生成
+            pera_list = np.array(pera_list)
+            score_list = np.array(score_list)
+            func.graph_pera(score_list, pera_list, self.write_name)
 
         else:
             #多項式、シグモイドカーネルの時
+            #スコアとその時のパラメタを保持するハッシュ
             score_dict = {}
-            """
-            for i in [ x*0.01 for x in range(1, 10, 2)]:
-                for j in [ x*0.01 for x in range(1, 10, 2)]:
-            """
+            #それぞれのパラメタについて順に検定を行う
             for i in [ 0.01 * x for x in range(1, 100, 5)]:
                 for j in [ 0.01 * x for x in range(1, 100, 5)]:
                     p_dict = {"p1": i, "p2": j}
@@ -103,8 +105,10 @@ class val_class():
                     x1 = str(i)
                     x2 = str(j)
                     score_dict[x1+","+x2] = score
+            #最良スコアの値とパラメタを表示する
             print("index:->" + max(score_dict, key=score_dict.get) + "最良スコア->" + str(max(score_dict.values()) ))
             tmp_l =(max(score_dict, key=score_dict.get)).split(",")
+            #最良スコアの時のパラメタで識別器を構成する
             x1 = float(tmp_l[0])
             x2 = float(tmp_l[1])
             p_dict = {"p1": x1, "p2": x2}

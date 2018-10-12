@@ -28,7 +28,6 @@ try:
 except IndexError:
     print("エラー:第三引数には分割数を入力してください")
     sys.exit()
-
 try:
     write_name = args[4]
 except IndexError:

@@ -173,7 +173,7 @@ def graph_dot(x_list, y_list, weight, shita, write_name):
     X = np.linspace(np.max(x_list), np.min(x_list), 1000)
     y = (-1 * X * weight[0] / weight[1]) + shita / weight[1]
     plt.plot(X,y)
-
+    #画像として保存　
     plt.savefig(write_name + '.png')
 
 def graph_ker(x_list, y_list, alpha_list, shita, kernel, write_name):
@@ -223,3 +223,8 @@ def graph_ker(x_list, y_list, alpha_list, shita, kernel, write_name):
     plt.scatter(Xb, Yb, c='blue')
 
     plt.savefig(write_name + '.png')
+
+def graph_pera(score_l, pera_l, write_name):
+    plt.figure()
+    plt.plot(pera_l, score_l)
+    plt.savefig(write_name + "-peraList.png")
