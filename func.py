@@ -8,12 +8,14 @@ import error
 #データをスケーリングする関数。単純に[0,1]にスケーリングする
 def normal_list(l):
     maxi = np.max(l)
-    mini = np.min(l)
     l = [x / maxi for x in l]
     return l
 
 #リストを等分割する関数
 def div_list(l, div_n):
+    if div_n == 0:
+        print("ERROR:分割する数は0より大きい必要があります")
+        sys.exit()
     result_l = []
     for i in range(div_n):
         result_l.append([]) 
@@ -30,13 +32,6 @@ def div_grid(larger, mini, number):
     for i in range(number):
         l.append(mini + each_sub * i)
     return l
-
-#デフォルトのパラメタを設定する関数.
-def set_def_dic(x):
-    if x == 0: return {}
-    elif x == 1: return {"p1": 1, "p2": 2}
-    elif x == 2: return {"p1": 10}
-    elif x == 3: return {"p1": 1, "p2": 4} 
 
 #xに応じて色々なカーネルを返す関数。
 def determine_kernel(x, p_dict):
@@ -74,16 +69,14 @@ class dot_kernel(kernel):
 class poly_kernel(kernel):
     def __init__(self, p_dict):
         self.p1 = p_dict["p1"]
-        self.p2 = p_dict["p2"]
 
     def set_pera(p_dict):
         self.p1 = p_dict["p1"]
-        self.p2 = p_dict["p2"]
 
     def return_fun(self):
         def poly(x1, x2):
             naiseki = np.dot(x1, x2)
-            return pow( self.p1+naiseki, self.p2)
+            return pow( 1+naiseki, self.p1)
         return poly
 
 #ガウスカーネル
@@ -114,7 +107,7 @@ class sigmoid_kernel(kernel):
     def return_fun(self):
         def sigmoid(x1, x2):
             naiseki = np.dot(x1, x2)
-            return np.tanh( self.p1 * np.dot(x1, x2) + self.p2)
+            return np.tanh( self.p1 * naiseki + self.p2)
         return sigmoid
 
 #ファイル名を受け取って、データのリストと各データの次元を返す関数
@@ -228,3 +221,29 @@ def graph_pera(score_l, pera_l, write_name):
     plt.figure()
     plt.plot(pera_l, score_l)
     plt.savefig(write_name + "-peraList.png")
+
+def graph_two_pera(score_l, pera1_l, pera2_l, write_name):
+    plt.figure()
+
+    Xr = []
+    Yr = []
+    Xb = []
+    Yb = []
+    Xc = []
+    Yc = []
+    #各データについてラベルを確認し分類する。
+    for i, x in enumerate(pera1_l):
+        if score_l[i] > 0.90:
+            Xr.append(pera1_l[i])
+            Yr.append(pera2_l[i])
+        elif score_l[i] > 0.72:
+            Xc.append(pera1_l[i])
+            Yc.append(pera2_l[i])
+        else:
+            Xb.append(pera1_l[i])
+            Yb.append(pera2_l[i])
+
+    plt.scatter(Xr, Yr, c='red')
+    plt.scatter(Xc, Yc, c='y')
+    plt.scatter(Xb, Yb, c='blue')
+    plt.savefig(write_name + '-peraList.png')

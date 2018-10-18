@@ -86,24 +86,44 @@ class Svm:
         self.shita = self.kernel(self.w, self.x_list[sup_number]) - self.y_list[sup_number]
 
     def eval(self, x_list, y_list):
-        all_num = 0
+        """
+        テストデータを受け取ってそれに対する識別率を返す関数
+        """
+        #データの数と正解データの数を覚えておく
+        all_num = len(x_list)
         cor_num = 0
-        for i in range(len(x_list)):
-            x = x_list[i]
-            result = 0.0
-            for m in range(len(self.x_list)):
-                result += self.alpha_list[m] * self.y_list[m] * self.kernel(x, self.x_list[m])
-            result -= self.shita
-            if result > 0.0:
-                if y_list[i] == 1: cor_num += 1
-                else: pass
-            else:
-                if y_list[i] == -1: cor_num += 1
-                else: pass
-            all_num += 1
-        print(str(cor_num) + "/" + str(all_num))
-        print(float(cor_num) / float(all_num))
-        return (float(cor_num) / float(all_num))
+        #内積を用いる場合
+        if self.kernel_number == 0:
+            #データセットのデータに対して正しい場合にインクリメントする
+            for i in range(len(x_list)):
+                x = x_list[i]
+                result = np.dot(self.w, x) - self.shita
+                if result > 0.0:
+                    if y_list[i] == 1: cor_num += 1
+                    else: pass
+                else:
+                    if y_list[i] == -1: cor_num += 1
+                    else: pass
+            #正解率を出力する。
+            print(str(cor_num) + "/" + str(all_num))
+            return (float(cor_num) / float(all_num))
+
+        else:
+            #内積のときと同じ。ただし識別器が違う
+            for i in range(len(x_list)):
+                x = x_list[i]
+                result = 0.0
+                for m in range(len(self.x_list)):
+                    result += self.alpha_list[m] * self.y_list[m] * self.kernel(x, self.x_list[m])
+                result -= self.shita
+                if result > 0.0:
+                    if y_list[i] == 1: cor_num += 1
+                    else: pass
+                else:
+                    if y_list[i] == -1: cor_num += 1
+                    else: pass
+            print(str(cor_num) + "/" + str(all_num))
+            return (float(cor_num) / float(all_num))
 
     def plot(self):
         #データの次元が2ならば2次元平面上に表示する.
